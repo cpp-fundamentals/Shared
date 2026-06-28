@@ -58,7 +58,10 @@ public:
         obj._b_ptr->shared = nullptr;
         return this;
     }
-
+    int use_count()
+    {
+        return _b_ptr->shared;
+    }
     T& operator*()
     {
         return *_ptr;
@@ -73,12 +76,23 @@ public:
         return _ptr;
     }
 
-    ~Shared();
+    ~Shared()
+    {
+        a_clean();
+    }
 private:
     T* _ptr;
     CountBlock* _b_ptr;
     void a_clean()
     {
-
+        if(_b_ptr->shared > 0)
+        {
+            _b_ptr->shared--;
+            if(_b_ptr->shared == 0)
+            {
+                delete _ptr;
+                _b_ptr->shared = 0;   
+            }
+        }
     }
 };
